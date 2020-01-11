@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HomePage.vue renders correctly 1`] = `
+<page-stub
+  xmlns:card="@nstudio/nativescript-cardview"
+>
+  <actionbar-stub>
+    <label
+      text="Home"
+    />
+  </actionbar-stub>
+   
+  <scrollview-stub>
+    <stacklayout-stub
+      horizontalalignment="center"
+    >
+      <label
+        class="head"
+        text=" Uren"
+      />
+       
+    </stacklayout-stub>
+  </scrollview-stub>
+</page-stub>
+`;
