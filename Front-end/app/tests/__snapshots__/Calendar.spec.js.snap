@@ -11,7 +11,11 @@ exports[`CalendarPage.vue renders correctly 1`] = `
   <stacklayout-stub
     horizontalalignment="center"
   >
-    <scrollview-stub>
+    <!---->
+     
+    <scrollview-stub
+      class=""
+    >
       <stacklayout-stub
         horizontalalignment="center"
       />

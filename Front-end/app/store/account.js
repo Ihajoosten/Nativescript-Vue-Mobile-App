@@ -1,5 +1,6 @@
-import * as Toast from "nativescript-toast";
 import axios from "axios";
+import LoginPage from "../components/login/LoginPage"
+import * as dialogs from "tns-core-modules/ui/dialogs";
 
 const account = {
   namespaced: true,
@@ -16,11 +17,16 @@ const account = {
           if (res.status === 200) {
             commit("setEmployee", res.data.result[0]);
           }
+          if (res.status === 401) {
+            setString('store', "");
+          }
         })
         .catch(err => {
-          Toast.makeText(
-            "Error: kon de werknemer gegevens niet ophalen"
-          ).show();
+          dialogs.alert({
+            title: 'Error',
+            message: 'Kon de werknemer gegevens niet ophalen',
+            okButtonText: 'Ok!'
+          });
         });
     },
   },

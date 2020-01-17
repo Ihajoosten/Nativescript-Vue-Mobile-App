@@ -1,11 +1,29 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import WelcomeScreen from '../components/login/WelcomeScreen';
 
-import { getString } from 'tns-core-modules/application-settings';
 
 jest.mock('tns-core-modules/application-settings', () => ({
   getString: jest.fn(() => "")
 }));
+
+jest.mock('nativescript-fingerprint-auth', () => ({
+  FingerprintAuth: jest.fn(),
+  getString: jest.fn(() => "")
+}));
+
+jest.mock('tns-core-modules/application', () => ({
+  android: {
+    on: jest.fn()
+  },
+  AndroidApplication: {
+    activityBackPressedEvent: {}
+  }
+}));
+
+jest.mock("tns-core-modules/ui/dialogs", () => ({
+  alert: jest.fn(() => Promise.resolve())
+}));
+
 
 const wrapper = shallowMount(WelcomeScreen, {
   propsData: {
@@ -20,7 +38,7 @@ describe('WelcomeScreen.vue', () => {
   });
 
   test('renders correctly', async () => {
-   await expect(wrapper.element).toMatchSnapshot();
+    await expect(wrapper.element).toMatchSnapshot();
   });
 
   it('is a Vue instance', async () => {
@@ -41,33 +59,33 @@ describe('WelcomeScreen.vue', () => {
 
   it('Expect component to have Label element', async () => {
     await expect(wrapper.find('Label')).toBeTruthy();
-  }); 
-  
+  });
+
   it('Expect component to have data property', async () => {
     await expect(typeof WelcomeScreen.data).toBe('function')
     const defaultData = WelcomeScreen.data()
     await expect(defaultData.busy).toBe(true)
-  }); 
+  });
 
   it('Expect component to have methods property which is an object', async () => {
     await expect(typeof WelcomeScreen.methods).toBe('object');
-  }); 
+  });
 
   it('Expect methods object to have onBusyChanged', async () => {
     await expect(typeof WelcomeScreen.methods.onBusyChanged).toBe('function');
-  }); 
+  });
 
   it('Expect methods object to have goToDashboard function', async () => {
     await expect(typeof WelcomeScreen.methods.goToDashboard).toBe('function');
-  }); 
+  });
 
   it('Expect methods object to have sleep fucntion', async () => {
     await expect(typeof WelcomeScreen.methods.sleep).toBe('function');
-  }); 
+  });
 
   it('Expect created() lifecylce hook', async () => {
     await expect(typeof WelcomeScreen.created).toBe('function');
-  }); 
+  });
 });
 
 

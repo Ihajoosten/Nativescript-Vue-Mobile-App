@@ -5,7 +5,8 @@ const bcrypt = require('bcryptjs');
 const secretkey = require('../assets/variables').secretkey;
 const database = require('../database/mysql.dao');
 const constants = require('../config/constants');
-const logger = require("../config/appconfig").logger
+const logger = require("../config/appconfig").logger;
+const auth = require('../controllers/auth.controller');
 
 router.post('/login', async (req, res) => {
   logger.info("/api/auth/login has been called")
@@ -75,5 +76,7 @@ router.post('/login', async (req, res) => {
     }
   });
 });
+
+router.get('/validateToken', auth.validateToken, auth.validateTokenEnd);
 
 module.exports = router;

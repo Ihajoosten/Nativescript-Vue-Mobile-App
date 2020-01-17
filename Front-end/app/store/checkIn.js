@@ -1,7 +1,6 @@
 import axios from "axios";
-import Vue from "vue";
-import * as Toast from "nativescript-toast";
-import { ValueList } from "nativescript-drop-down";
+import { setString } from 'tns-core-modules/application-settings';
+import * as dialogs from 'tns-core-modules/ui/dialogs';
 
 const checkIn = {
   namespaced: true,
@@ -25,13 +24,18 @@ const checkIn = {
           headers: { Authorization: `Bearer ${token}` }
         })
         .then(res => {
+          if (res.status === 401) {
+            setString('store', "");
+          }
           commit("setBranchesWithDepartments", res.data.result);
         })
         .catch(err => {
-          console.log('-------------------------------- COULD NOT GET WORKED HOURS')
-          // Toast.makeText(
-          //   "Error: kon de filialen en afdelingen niet ophalen"
-          // ).show();
+          dialogs.alert({
+            title: 'Error',
+            message: 'Kon de filialen en afdelingen niet ophalen',
+            okButtonText: 'Ok!'
+          });
+
         });
     },
     postCheckIn({ state, commit }, { form, token }) {
@@ -40,10 +44,23 @@ const checkIn = {
           headers: { Authorization: `Bearer ${token}` }
         })
         .then(res => {
+          if (res.status === 401) {
+            setString('store', "");
+          }
           commit("setPostCheckInStatus", res.status);
+          const checkInSaveData = {
+            branchId: form.branchId,
+            departmentId: form.departmentId,
+            pause: 0
+          };
+          setString('checkIn', JSON.stringify(checkInSaveData));
         })
         .catch(err => {
-          Toast.makeText("Error: Kon niet inklokken").show();
+          dialogs.alert({
+            title: 'Error',
+            message: 'Kon niet inklokken!',
+            okButtonText: 'Ok!'
+          });
         });
     },
     fetchAllWorkedHours({ state, commit }, token) {
@@ -52,13 +69,17 @@ const checkIn = {
           headers: { Authorization: `Bearer ${token}` }
         })
         .then(res => {
+          if (res.status === 401) {
+            setString('store', "");
+          }
           commit("setWorkedHours", res.data.result);
         })
         .catch(err => {
-          console.log('-------------------------------- COULD NOT GET WORKED HOURS')
-          // Toast.makeText(
-          //   "Error: de gewerkte uren konden niet worden opgehaald"
-          // );
+          dialogs.alert({
+            title: 'Error',
+            message: 'De gewerkte uren konden niet worden opgehaald!',
+            okButtonText: 'Ok!'
+          });
         });
     },
     updateWorkedHours({ state, commit }, { token, data }) {
@@ -69,11 +90,24 @@ const checkIn = {
           }
         })
         .then(res => {
+          if (res.status === 401) {
+            setString('store', "");
+          }
           commit("setCheckOutStatus", res.status);
         })
         .catch(error => {
-          Toast.makeText(error.message);
+          dialogs.alert({
+            title: 'Error',
+            message: error.message,
+            okButtonText: 'Ok!'
+          });
         });
+    },
+    clearState({state, commit}) {
+      commit('setBranchId', null);
+      commit('setDepartmentId', null);
+      commit('setPostCheckInStatus', 0);
+      commit('setCheckOutStatus', 0);
     }
   },
   mutations: {

@@ -1,4 +1,4 @@
-
+import { getString, setString } from 'tns-core-modules/application-settings';
 const pause = {
   namespaced: true,
   state: {
@@ -7,7 +7,7 @@ const pause = {
   },
   actions: {
     addEndPause({ state, commit }, endTime) {
-      let start = state.startTime.split(":");
+      let start = getString('pause').split(":");
       let startHours = +start[0];
       let startMinutes = +start[1];
 
@@ -27,19 +27,29 @@ const pause = {
 
       const pauseTime = 60 * x + y;
 
-      commit("addPause", pauseTime);
+      setString('pause', '');
+      const checkInData = JSON.parse(getString('checkIn'));
+      checkInData.pause += pauseTime;
+      setString('checkIn', JSON.stringify(checkInData));
+
+      commit("setPause", checkInData.pause);
       return state.pause;
     },
     addStartPause({ _, commit }, startTime) {
       commit("setStartTime", startTime);
+      setString('pause', startTime);
+    },
+    clearState({state, commit}) {
+      commit('setStartTime', null);
+      commit('setPause', 0);
     }
   },
   mutations: {
     setStartTime(state, time) {
       state.startTime = time;
     },
-    addPause(state, item) {
-      state.pause += item;
+    setPause(state, total) {
+      state.pause = total;
     }
   }
 };

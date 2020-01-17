@@ -1,13 +1,13 @@
 <template>
-  <card-view class="hourCard" elevation="10" radius="5">
+  <card-view class="hourCard" elevation="10" radius="5" @tap="onTap">
     <FlexBoxLayout style="padding: 10 10;">
       <StackLayout orientation="vertical" width="90%">
         <StackLayout orientation="horizontal" class="cardLine">
-          <label id="icon" col="1" class="fa" :text="'fa-calendar-alt' | fonticon"></label>
+          <label id="icon1" col="1" class="fa" :text="'fa-calendar-alt' | fonticon"></label>
           <label id="date" col="2" :text="convertDateToString(hour.Date)"></label>
         </StackLayout>
         <StackLayout orientation="horizontal" class="cardLine">
-          <label id="icon" col="1" class="fa" :text="'fa-check-circle' | fonticon"></label>
+          <label id="icon1" col="1" class="fa" :text="'fa-check-circle' | fonticon"></label>
           <label id="workedHours" col="2" :text="convertedStartTime + ' - ' + convertedEndTime"></label>
         </StackLayout>
         <StackLayout orientation="horizontal" class="cardLine">
@@ -15,7 +15,7 @@
           <label id="pause" col="2" :text="hour.Pause"></label>
         </StackLayout>
         <StackLayout orientation="horizontal" class="cardLine">
-          <label id="icon" col="1" class="fas" :text="'fa-equals' | fonticon"></label>
+          <label id="icon1" col="1" class="fas" :text="'fa-equals' | fonticon"></label>
           <label v-if="hour.Worked != null" id="worked" col="2" :text="hour.Worked"></label>
           <label v-else id="worked" col="2" text="nog niet uitgeklokt"></label>
         </StackLayout>
@@ -26,7 +26,7 @@
         <StackLayout orientation="horizontal" class="cardLine">
           <label id="icon" col="1" class="fas" :text="'fa-sitemap' | fonticon"></label>
           <label id="departmentName" col="2" :text="hour.DepartmentName"></label>
-        </StackLayout> -->
+        </StackLayout>-->
       </StackLayout>
       <FlexBoxLayout
         flexDirection="column-reverse"
@@ -55,6 +55,10 @@ export default {
       return `${dates.days[d.getDay()]} ${d.getDate()} ${
         dates.months[d.getMonth()]
       } ${d.getFullYear()}`;
+    },
+    onTap() {
+      console.log("Details aangeklikt")
+      this.$emit('detailsClicked', this.hour);
     }
   },
   computed: {
@@ -86,6 +90,14 @@ export default {
 
 .hourCard #icon {
   color: #dddddd;
+  margin-top: 3dip;
+  font-size: 15dip;
+}
+.hourCard #icon1 {
+  color: #dddddd;
+  margin-top: 3dip;
+  font-size: 15dip;
+  margin-left: 1dip;
 }
 
 #date {

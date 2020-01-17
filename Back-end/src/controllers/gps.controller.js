@@ -38,9 +38,9 @@ module.exports = {
 }
 
 function checkGPS(coordinateIn, coordinateOut){
-    //0.005 equals 1 km
-    let coordinateMin = +coordinateIn - 0.005;
-    let coordinateMax = +coordinateIn + 0.005;
+    //0.0011454 equals 300 meters
+    let coordinateMin = +coordinateIn - 0.0011454;
+    let coordinateMax = +coordinateIn + 0.0011454;
     return coordinateOut > coordinateMin && coordinateOut < coordinateMax;
 }
 

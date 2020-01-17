@@ -2,6 +2,15 @@ import { shallowMount, createLocalVue } from "@vue/test-utils";
 import Account from "../components/dashboard/AccountPage";
 import Vuex from "vuex";
 
+jest.mock('tns-core-modules/application', () => ({
+  android: {
+    on: jest.fn()
+  },
+  AndroidApplication: {
+    activityBackPressedEvent: {}
+  }
+}));
+
 const localVue = createLocalVue();
 localVue.use(Vuex);
 

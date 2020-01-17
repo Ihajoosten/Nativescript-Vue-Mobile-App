@@ -1,18 +1,20 @@
 <template>
   <Page class="body" actionBarHidden="true">
-    <Image
-          src="~/assets/images/nos-managementapp-logo.png"
-          class="logo"
-        />
+    <Image src="~/assets/images/nos-managementapp-logo.png" class="logo" />
   </Page>
 </template>
 
 <script>
-import Dashboard from './dashboard/Dashboard';
-import * as Toast from 'nativescript-toast';
-import LoginPage from './login/LoginPage';
-import axios from 'axios';
-import { getString } from 'tns-core-modules/application-settings';
+import Dashboard from "./dashboard/Dashboard";
+import LoginPage from "./login/LoginPage";
+import axios from "axios";
+import { getString } from "tns-core-modules/application-settings";
+import * as dialogs from "tns-core-modules/ui/dialogs";
+import {
+  FingerprintAuth
+} from "nativescript-fingerprint-auth";
+
+var fingerprintAuth = new FingerprintAuth();
 
 export default {
   components: {
@@ -28,7 +30,7 @@ export default {
       this.$navigateTo(LoginPage, {
         clearHistory: true,
         transition: {
-          name: 'fade',
+          name: "fade",
           duration: 400
         },
         props: {
@@ -36,48 +38,86 @@ export default {
         }
       });
     },
-      goToDashboard() {
-          this.$navigateTo(Dashboard, {
-              clearHistory: true,
-              transition: {
-                  name: 'fade',
-                  duration: 400
-              }
-          });
-      }
+    goToDashboard() {
+      this.$navigateTo(Dashboard, {
+        clearHistory: true,
+        transition: {
+          name: "fade",
+          duration: 400
+        }
+      });
+    }
   },
   mounted() {
-      if ( getString('store') && getString('store') != "") {
-          this.$store.commit('auth/load');
+    var usefingerprint = getString("usetouch");
+
+    if (getString("store") && getString("store") != "") {
+      fingerprintAuth.available().then(function(avail) {
+        if (avail.any && avail.touch && usefingerprint === "true") {
+          fingerprintAuth
+            .verifyFingerprint({
+              message: "Scan vingerafdruk",
+              useCustomAndroidUI: false
+            })
+            .then(enteredPassword => {
+              if (enteredPassword === undefined) {
+                this.$store.commit("auth/load");
+                setTimeout(() => {
+                  this.goToDashboard();
+                }, 2000);
+              } else {
+                this.$store.commit("auth/load");
+                setTimeout(() => {
+                  this.goToDashboard();
+                }, 2000);
+              }
+            })
+            .catch(err => {
+              this.$store.commit("auth/load");
+              setTimeout(() => {
+                this.goToDashboard();
+              }, 2000);
+            });
+        } else {
+          this.$store.commit("auth/load");
           setTimeout(() => {
-              this.goToDashboard();
+            this.goToDashboard();
           }, 2000);
-      } else {
-          axios
-              .get('https://nostrapersoneelsapi.herokuapp.com/api/company/domains')
-              .then(
-                  res => {
-                      res.data.result.forEach(domain => {
-                          this.domains.push(domain.Domain);
-                      })
+        }
+      });
+      this.$store.commit("auth/load");
+      setTimeout(() => {
+        this.goToDashboard();
+      }, 2000);
+    } else {
+      axios
+        .get("https://nostrapersoneelsapi.herokuapp.com/api/company/domains")
+        .then(
+          res => {
+            res.data.result.forEach(domain => {
+              this.domains.push(domain.Domain);
+            });
 
-                      setTimeout(() => {
-                          this.goToLogin();
-                      }, 1500);
-                  },
-                  error => {
-                      Toast.makeText("Kon geen verbinding maken met API").show();
-                  }
-              );
-      }
-
+            setTimeout(() => {
+              this.goToLogin();
+            }, 1500);
+          },
+          error => {
+            dialogs.alert({
+              title: "Error",
+              message: "Kon geen verbinding maken met API",
+              okButtonText: "Ok!"
+            });
+          }
+        );
+    }
   }
 };
 </script>
 
 <style scoped>
 .body {
-  background-image: url('~/assets/images/SplashScreen.jpg');
+  background-image: url("~/assets/images/SplashScreen.jpg");
   background-repeat: no-repeat;
   background-position: center top;
   background-size: cover;

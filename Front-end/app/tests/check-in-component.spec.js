@@ -3,6 +3,7 @@ import CheckIn from "../components/Check-in/CheckInComponent";
 import * as Toast from 'nativescript-toast';
 import * as geolocation from "nativescript-geolocation";
 import Vuex from "vuex";
+import * as dialogs from 'tns-core-modules/ui/dialogs';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -18,10 +19,8 @@ jest.mock("nativescript-geolocation", () => ({
   isEnabled: jest.fn(() => Promise.resolve(true))
 }));
 
-jest.mock("nativescript-toast", () => ({
-  makeText: jest.fn(() => ({
-    show: jest.fn()
-  }))
+jest.mock("tns-core-modules/ui/dialogs", () => ({
+  alert: jest.fn(() => Promise.resolve())
 }));
 
 jest.mock("axios", () => ({
@@ -193,8 +192,11 @@ describe("CheckInComponent.vue", () => {
 
     await expect(method).toBeCalled();
     await expect(geolocation.isEnabled).toBeCalledWith();
-    await expect(Toast.makeText).toBeCalledWith("Zet je locatie aan om in te klokken!");
-
+    await expect(dialogs.alert).toBeCalledWith({
+      title: 'Error',
+      message: 'Zet je locatie aan om in te klokken!',
+      okButtonText: 'Ok!'
+    });
     await expect(wrapper.vm.isProcessing).toBe(false);
   });
   it("Expect isProcessing to be false without selected department", async () => {
@@ -237,7 +239,11 @@ describe("CheckInComponent.vue", () => {
     await expect(method).toBeCalled();
     await expect(geolocation.isEnabled).toBeCalledWith();
     await expect(wrapper.vm.isProcessing).toBe(false);
-    await expect(Toast.makeText).toBeCalledWith("Zet je locatie aan om in te klokken!");
+    await expect(dialogs.alert).toBeCalledWith({
+      title: 'Error',
+      message: 'Zet je locatie aan om in te klokken!',
+      okButtonText: 'Ok!'
+    });
   });
 
   it("Expect getAllBranchesAndDepartments to get called when component is created", async () => {

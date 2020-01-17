@@ -74,9 +74,9 @@
 
 <script>
 import { ValueList } from "nativescript-drop-down";
-import * as Toast from "nativescript-toast";
 import { Accuracy } from "tns-core-modules/ui/enums";
 import * as geolocation from "nativescript-geolocation";
+import * as dialogs from "tns-core-modules/ui/dialogs";
 
 export default {
   props: ["token"],
@@ -149,13 +149,21 @@ export default {
       this.form.startTime = startTime;
 
       if (!this.form.branch || !this.form.branchId) {
-        Toast.makeText("Selecteer uw filiaal!").show();
+        dialogs.alert({
+          title: 'Error',
+          message: 'Selecteer uw filiaal!',
+          okButtonText: 'Ok!'
+        });
         this.isProcessing = false;
         return;
       }
 
       if (!this.form.department || !this.form.departmentId) {
-          Toast.makeText("Selecteer uw afdeling!").show();
+          dialogs.alert({
+            title: 'Error',
+            message: 'Selecteer uw afdeling!',
+            okButtonText: 'Ok!'
+          });
           this.isProcessing = false;
           return;
       }
@@ -173,7 +181,11 @@ export default {
               this.form.longitude = res.longitude;
 
               if (!this.form.longitude || !this.form.latitude) {
-                Toast.makeText("Zet je locatie aan om in te klokken!").show();
+                dialogs.alert({
+                  title: 'Error',
+                  message: 'Zet je locatie aan om in te klokken!',
+                  okButtonText: 'Ok!'
+                });
                 this.isProcessing = false;
                 return;
               }
@@ -186,7 +198,11 @@ export default {
               this.isProcessing = false;
           })
           .catch(err => {
-              Toast.makeText(err.message).show();
+              dialogs.alert({
+                title: 'Error',
+                message: err.message,
+                okButtonText: 'Ok!'
+              });
               this.isProcessing = false;
           });
         } else {
@@ -297,7 +313,7 @@ DropDown {
 }
 
 GridLayout.gridTextfield {
-  border-width: 0 0 2 0;
+  border-width: 0 0 1 0;
   border-color: #b3676a6c;
   padding-top: 5;
 }

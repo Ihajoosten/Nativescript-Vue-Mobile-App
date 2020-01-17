@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Nostradamus Front-end</string>
-    <string name="title_activity_kimera">Nostradamus Front-end</string>
+    <string name="app_name">Nostradamus</string>
+    <string name="title_activity_kimera">Nostradamus</string>
 </resources>

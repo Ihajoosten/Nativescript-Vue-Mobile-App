@@ -1,8 +1,27 @@
 import { shallowMount } from "@vue/test-utils";
 import App from "../components/App";
 
+
 jest.mock("tns-core-modules/application-settings", () => ({
   getString: jest.fn()
+}));
+
+jest.mock('nativescript-fingerprint-auth', () => ({
+  FingerprintAuth: jest.fn(),
+  getString: jest.fn(() => "")
+}));
+
+jest.mock('tns-core-modules/application', () => ({
+  android: {
+    on: jest.fn()
+  },
+  AndroidApplication: {
+    activityBackPressedEvent: {}
+  }
+}));
+
+jest.mock("tns-core-modules/ui/dialogs", () => ({
+  alert: jest.fn(() => Promise.resolve())
 }));
 
 describe("App.vue", () => {

@@ -10,20 +10,14 @@
               class="image"
               :src="photo()"
             />
-            <label class="welcomeText" text="Goedemiddag Robin!" />
+            <label class="welcomeText" :text="screenText" />
           </StackLayout>
           <StackLayout row="2">
-            <Button col="1" class="checkOutBtn" @tap="onCheckOutTap"
-              >Uitklokken</Button
-            >
+            <Button col="1" class="checkOutBtn" @tap="onCheckOutTap">Uitklokken</Button>
           </StackLayout>
           <StackLayout class="buttons" orientation="horizontal" row="3">
-            <Button v-on:tap="goToPauseScreen" col="1" class="breakBtn"
-              >Pauze</Button
-            >
-            <Button :isEnabled="false" col="1" class="changeBtn"
-              >Wisselen</Button
-            >
+            <Button v-on:tap="goToPauseScreen" col="1" class="breakBtn">Pauze</Button>
+            <Button :isEnabled="false" col="1" class="changeBtn">Wisselen</Button>
           </StackLayout>
         </GridLayout>
       </card-view>
@@ -32,9 +26,10 @@
 </template>
 
 <script>
-import * as Toast from "nativescript-toast";
 import { Accuracy } from "tns-core-modules/ui/enums";
 import * as geolocation from "nativescript-geolocation";
+import { getString } from "tns-core-modules/application-settings";
+import * as dialogs from "tns-core-modules/ui/dialogs";
 const test = require("base64-arraybuffer");
 
 export default {
@@ -50,6 +45,11 @@ export default {
       checkOutStatus: 0,
       endTime: null
     };
+  },
+  computed: {
+    screenText: function() {
+      return `Goedemiddag ${this.employee.Nickname}!`
+    }
   },
   methods: {
     goToPauseScreen() {
@@ -79,7 +79,11 @@ export default {
           this.form.fetchedLongitude = res.longitude;
         })
         .catch(err => {
-          Toast.makeText(err.message).show();
+          dialogs.alert({
+            title: "Error",
+            message: err.message,
+            okButtonText: "Ok!"
+          });
         });
     },
     onCheckOutTap() {
@@ -95,21 +99,26 @@ export default {
       }
 
       if (this.form.fetchedLatitude == "" || this.form.fetchedLongitude == "") {
-        console.log('--------------------------- INVALID LATITUDE/LONGITUDE')
-        // Toast.makeText("Zet je locatie aan om uit te klokken!").show();
+        console.log("--------------------------- INVALID LATITUDE/LONGITUDE");
+
+        dialogs.alert({
+          title: "Error",
+          message: "Zet je locatie aan om uit te klokken!",
+          okButtonText: "Ok!"
+        });
         return;
       }
 
+      const checkInData = JSON.parse(getString("checkIn"));
+
       const checkOutData = {
         endTime: this.endTime,
-        branchId: this.branchId,
-        departmentId: this.departmentId,
+        branchId: checkInData.branchId,
+        departmentId: checkInData.departmentId,
         latitude: this.form.fetchedLatitude,
-        longitude: this.form.fetchedLongitude ,
-        pause: this.$store.state.pause.pause
+        longitude: this.form.fetchedLongitude,
+        pause: checkInData.pause
       };
-
-      console.log('-------------------- CHECKOUT DATA -----------------------> ', checkOutData)
 
       this.$store.dispatch("checkIn/updateWorkedHours", {
         data: checkOutData,
@@ -131,9 +140,17 @@ export default {
       if (this.checkOutStatus === 200) {
         this.$emit("onCheckedOut", this.endTime);
       } else if (this.checkOutStatus === 400) {
-        Toast.makeText("Ben je wel op de juiste locatie?");
+        dialogs.alert({
+          title: "Error",
+          message: "Ben je wel op de juiste locatie?",
+          okButtonText: "Ok!"
+        });
       } else {
-        Toast.makeText("Iets is er misgegaan met je request").show();
+        dialogs.alert({
+          title: "Error",
+          message: "Iets is er misgegaan met je request",
+          okButtonText: "Ok!"
+        });
       }
     }
   }
@@ -142,7 +159,6 @@ export default {
 
 <style scoped>
 .image {
-  font-size: 250px;
   color: #dddddd;
   text-align: center;
   border-radius: 200%;
@@ -153,20 +169,19 @@ export default {
 
 .welcomeText {
   text-align: center;
-  font-size: 20px;
+  font-size: 20dip;
   color: #676a6c;
   padding: 15 0;
 }
 
 .card {
-  margin-top: 25px;
+  margin-top: 25dip;
   width: 90%;
-  margin-bottom: 30px;
+  margin-bottom: 30dip;
 }
 
 label {
   color: #dddddd;
-  font-size: 13px;
 }
 
 button {
@@ -178,7 +193,6 @@ button {
 }
 
 button.checkOutBtn {
-  height: 110px;
   border-radius: 10;
   width: 90%;
   background-color: #00a0d1;
@@ -186,14 +200,12 @@ button.checkOutBtn {
 }
 
 button.breakBtn {
-  height: 100px;
   width: 45%;
   background-color: #dddddd;
   color: #b3676a6c;
 }
 
 button.changeBtn {
-  height: 100px;
   width: 45%;
   background-color: #dddddd;
   color: #b3676a6c;

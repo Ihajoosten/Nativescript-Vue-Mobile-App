@@ -3,6 +3,19 @@ import Home from '../components/dashboard/HomePage';
 import Vuex from 'vuex';
 import CheckIn from "../components/Check-in/CheckInComponent";
 
+jest.mock('tns-core-modules/application', () => ({
+  android: {
+    on: jest.fn()
+  },
+  AndroidApplication: {
+    activityBackPressedEvent: {}
+  }
+}));
+
+jest.mock("tns-core-modules/ui/dialogs", () => ({
+  alert: jest.fn(() => Promise.resolve())
+}));
+
 const localVue = createLocalVue();
 localVue.use(Vuex);
 

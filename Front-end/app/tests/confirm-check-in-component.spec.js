@@ -1,12 +1,16 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import ConfrimCheckIn from '../components/Check-in/ConfirmationCheckInComponent';
+import ConfirmCheckIn from '../components/Check-in/ConfirmationCheckInComponent';
 import Vuex from "vuex";
 import CheckIn from "../components/Check-in/CheckInComponent";
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('ConfrimCheckInComponent.vue', () => {
+jest.mock("tns-core-modules/ui/dialogs", () => ({
+  alert: jest.fn(() => Promise.resolve())
+}));
+
+describe('ConfirmCheckInComponent.vue', () => {
   let store;
   let state;
   let actions;
@@ -35,62 +39,62 @@ describe('ConfrimCheckInComponent.vue', () => {
   
   
   it('mounts and renders', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper.html()).toBeTruthy();
   });
 
   it('renders correctly', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper.element).toMatchSnapshot();
   });
 
   it('is a Vue instance', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper.isVueInstance()).toBeTruthy();
   });
 
   it('Expect component to exist', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper).toBeTruthy();
   });
 
   it('Expect component to have Page element', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper.find('Page')).toBeTruthy();
   });
 
   it('Expect component to have StackLayout element', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper.find('StackLayout')).toBeTruthy();
   });
 
   it('Expect component to have template element', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper.find('template')).toBeTruthy();
   });
 
   it('Expect component to have script element', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper.find('script')).toBeTruthy();
   });
 
   it('Expect component to have style element', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper.find('style')).toBeTruthy();
   });
 
   it('Expect component to have Label element', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper.find('Label')).toBeTruthy();
   });
 
   it('Expect component to have HoursPage Component', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(wrapper.find('HoursPage')).toBeTruthy();
   });
 
   it('Expect component to have props array property', async () => {
-    const wrapper = shallowMount(ConfrimCheckIn, { store, localVue });
+    const wrapper = shallowMount(ConfirmCheckIn, { store, localVue });
     await expect(typeof wrapper.props).toBe('function')
   });
 });

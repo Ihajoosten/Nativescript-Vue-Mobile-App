@@ -33,8 +33,10 @@ module.exports = {
     funcRefreshToken(token) {
         // container function to test refreshToken function
         return refreshToken(token);
+    },
+    validateTokenEnd: (req, res, next) => {
+        res.status(200).json({ token: req.token });
     }
-
 }
 
 const validateToken = (token) => {
@@ -52,11 +54,6 @@ function refreshToken(token) {
         const exp = decode.exp;
         let todayTime = new Date().getTime();
         let expTime = new Date(exp * 1000).getTime();
-
-        if(todayTime < expTime) {
-            // Token is not yet expired
-            return token;
-        }
 
         // Token is expired
         if(todayTime - expTime > 60 * 60 * 24 * 1000) {

@@ -1,6 +1,15 @@
-import { shallowMount, mount } from '@vue/test-utils';
 import WorkedHours from '../components/Worked-hours/WorkedHoursComponent'
-import { itemsProperty } from 'nativescript-drop-down';
+
+jest.mock('tns-core-modules/application', () => ({
+    android: {
+      on: jest.fn()
+    },
+    AndroidApplication: {
+      activityBackPressedEvent: {}
+    }
+  }));
+
+
 
 describe('WorkedHours tests', () => {
 

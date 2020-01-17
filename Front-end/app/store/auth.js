@@ -1,13 +1,15 @@
 import axios from "axios";
-import * as Toast from "nativescript-toast";
-import { getString, setString } from "tns-core-modules/application-settings";
+import { getString, setString, clear } from "tns-core-modules/application-settings";
+import * as dialogs from "tns-core-modules/ui/dialogs";
+
 
 const auth = {
     namespaced: true,
     state: {
         token: null,
         user: null,
-        isProcessing: true
+        isProcessing: true,
+        isValidToken: false
     },
     actions: {
         getToken({ state, commit }, { token }) {
@@ -15,26 +17,66 @@ const auth = {
             setString('store', JSON.stringify(state));
             return state.token;
         },
-        loginUser({state, commit}, user) {
+        loginUser({ state, commit }, user) {
             axios
                 .post('https://nostrapersoneelsapi.herokuapp.com/api/auth/login', user)
                 .then((res) => {
-                    if ( res.status === 200 ) {
+                    if (res.status === 200) {
                         commit('setUser', res.data.user);
                         commit('setToken', res.data.token);
                         setString('store', JSON.stringify(state));
+                        commit('setIsValidToken', true);
                     } else {
-                        Toast.makeText("Ongeldige gebruikersnaam of wachtwoord voor domein").show();
+                        dialogs.alert({
+                            title: 'Error',
+                            message: 'Ongeldige gebruikersnaam of wachtwoord voor domein',
+                            okButtonText: 'Ok!'
+                        });
                         commit('setIsProcessing', false);
+                        commit('setIsValidToken', false);
                     }
                 })
                 .catch((err) => {
-                    Toast.makeText("Kon niet inloggen - server fout").show();
+                    dialogs.alert({
+                        title: 'Error',
+                        message: 'Kon niet inloggen - server fout',
+                        okButtonText: 'Ok!'
+                    });
                 });
         },
-        logoutUser({ state, commit } ) {
-            console.log('--------------------------- SETTING STORE TO NULL')
+        logoutUser({ state, commit }) {
             setString('store', "");
+            setString('checkIn', "");
+            setString('pauze', "");
+        },
+        validateToken({ state, commit }, token) {
+            axios
+                .get('https://nostrapersoneelsapi.herokuapp.com/api/auth/validateToken', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                .then(res => {
+                    if (res.status === 200) {
+                        const resToken = res.data.token;
+                        commit('setToken', resToken);
+                        commit('setIsValidToken', true);
+                        setString('store', JSON.stringify(state))
+                    } else if (res.status === 401) {
+                        commit('setIsValidToken', false);
+                        clear();
+                    }
+                    return state.isValidToken;
+                })
+                .catch(err => {
+                    dialogs.alert({
+                        title: 'Error',
+                        message: 'Kon geen verbinding maken met server',
+                        okButtonText: 'Ok!'
+                    });
+                    return false;
+                });
+
         }
     },
     mutations: {
@@ -48,12 +90,12 @@ const auth = {
             state.isProcessing = bool;
         },
         load(state) {
-            if(getString("store")) {
+            if (getString("store")) {
                 Object.assign(state, JSON.parse(getString('store')));
-
-                console.log('to save state which is edited ---------------------> ', state,
-                    state.token, state.user);
             }
+        },
+        setIsValidToken(state, bool) {
+            state.isValidToken = bool;
         }
     }
 }

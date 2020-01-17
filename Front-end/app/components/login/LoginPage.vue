@@ -2,80 +2,79 @@
   <Page actionBarHidden="true" xmlns:dd="nativescript-drop-down">
     <ScrollView>
       <StackLayout>
-        <Image
-          src="~/assets/images/nos-managementapp-logo.png"
-          class="login-logo"
-        />
+        <Image src="~/assets/images/nos-managementapp-logo.png" class="login-logo" />
 
-        <GridLayout rows="auto, auto, auto, auto, auto, auto" class="form" v-bind:class="{ fadeBackground: isProcessing }">
-          <Label text="Gebruikersnaam" row="0" v-bind:class="{ isFaded: isProcessing }"/>
-          <GridLayout columns="*, auto" row="1" v-bind:class="{ isFaded: isProcessing }">
-            <TextField
-              automationText="username"
-              col="0"
-              v-model="user.username"
-              hint="Type something"
-              returnKeyType="next"
-              :isEnabled="!isProcessing"
-            />
-            <Label col="1" class="fas" :text="'fa-user' | fonticon" />
-          </GridLayout>
-
-          <Label text="Wachtwoord" row="2" v-bind:class="{ isFaded: isProcessing }"/>
-          <GridLayout columns="*, auto" row="3" v-bind:class="{ isFaded: isProcessing }">
-            <TextField
-              automationText="password"
-              col="0"
-              v-model="user.password"
-              hint="Type something"
-              returnKeyType="next"
-              :isEnabled="!isProcessing"
-              secure
-            />
-            <Label col="1" class="fas" :text="'fa-unlock' | fonticon" />
-          </GridLayout>
-
+        <GridLayout rows="auto" class="container">
           <StackLayout
-            v-bind:class="{ isFaded: isProcessing }"
-            orientation="horizontal"
-            class="horContainer"
-            row="4"
+            row="0"
+            class="form"
+            v-bind:class="{ fadeBackground: isProcessing }"
           >
-            <StackLayout class="account-name">
-              <Label text="Accountnaam" />
+            <Label text="Gebruikersnaam" v-bind:class="{ isFaded: isProcessing }"/>
+            <GridLayout columns="*, auto" v-bind:class="{ isFaded: isProcessing }">
               <TextField
-                automationText="accountname"
-                v-model="user.accountname"
+                automationText="username"
+                col="0"
+                v-model="user.username"
                 hint="Type something"
                 returnKeyType="next"
                 :isEnabled="!isProcessing"
               />
-            </StackLayout>
+              <Label col="1" class="fas" :text="'fa-user' | fonticon" />
+            </GridLayout>
 
-            <StackLayout class="domain-name">
-              <Label text="Domeinnaam" />
-
-              <DropDown 
-              automationText="selection"
-                hint="Domein"
-                :items="domains" 
+            <Label text="Wachtwoord" v-bind:class="{ isFaded: isProcessing }" />
+            <GridLayout columns="*, auto" v-bind:class="{ isFaded: isProcessing }">
+              <TextField
+                automationText="password"
+                col="0"
+                v-model="user.password"
+                hint="Type something"
+                returnKeyType="next"
                 :isEnabled="!isProcessing"
-                itemsPadding="15px"
-                v-on:selectedIndexChanged="domainChanged"/>
-            </StackLayout>
-          </StackLayout>
+                secure
+              />
+              <Label col="1" class="fas" :text="'fa-unlock' | fonticon" />
+            </GridLayout>
 
-          <Button 
-            v-on:tap="onButtonTap" 
-            row="5" 
-            :isEnabled="!isProcessing"
-            class="loginBtn"
-            v-bind:class="{ isFaded: isProcessing }">Inloggen</Button>
-          
-          <ActivityIndicator
-            rowSpan="6"
-            v-bind:busy="isProcessing"
-          ></ActivityIndicator>
+            <StackLayout
+              v-bind:class="{ isFaded: isProcessing }"
+              orientation="horizontal"
+              class="horContainer"
+            >
+              <StackLayout class="account-name">
+                <Label text="Accountnaam" />
+                <TextField
+                  automationText="accountname"
+                  v-model="user.accountname"
+                  hint="Type something"
+                  returnKeyType="next"
+                  :isEnabled="!isProcessing"
+                />
+              </StackLayout>
+
+              <StackLayout class="domain-name">
+                <Label text="Domeinnaam" />
+
+                <DropDown
+                  automationText="selection"
+                  hint="Domein"
+                  :items="domains"
+                  :isEnabled="!isProcessing"
+                  itemsPadding="15px"
+                  v-on:selectedIndexChanged="domainChanged"
+                />
+              </StackLayout>
+            </StackLayout>
+
+            <Button
+              v-on:tap="onButtonTap"
+              :isEnabled="!isProcessing"
+              class="loginBtn"
+              v-bind:class="{ isFaded: isProcessing }"
+            >Inloggen</Button>
+          </StackLayout>
+          <ActivityIndicator rowspan="0" v-bind:busy="isProcessing"></ActivityIndicator>
         </GridLayout>
       </StackLayout>
     </ScrollView>
@@ -83,60 +82,76 @@
 </template>
 
 <script>
-import * as Toast from 'nativescript-toast';
-import WelcomeScreen from './WelcomeScreen';
+import WelcomeScreen from "./WelcomeScreen";
+import * as dialogs from "tns-core-modules/ui/dialogs";
 
 export default {
   data() {
     return {
       isProcessing: false,
       user: {
-        username: '',
-        password: '',
-        accountname: '',
-        domain: ''
+        username: "",
+        password: "",
+        accountname: "",
+        domain: ""
       }
     };
   },
-  props: ['domains'],
+  props: ["domains"],
   methods: {
-     onButtonTap() {
+    onButtonTap() {
       if (!this.user.username) {
-        Toast.makeText("Vul uw gebruikersnaam in!").show();
+        dialogs.alert({
+          title: "Error",
+          message: "Vul uw gebruikersnaam in!",
+          okButtonText: "Ok!"
+        });
         return;
       }
 
       if (!this.user.password) {
-        Toast.makeText("Vul uw wachtwoord in!").show();
+        dialogs.alert({
+          title: "Error",
+          message: "Vul uw wachtwoord in!",
+          okButtonText: "Ok!"
+        });
         return;
       }
 
       if (!this.user.accountname) {
-        Toast.makeText("Vul uw accountnaam in!").show();
+        dialogs.alert({
+          title: "Error",
+          message: "Vul uw accountnaam in!",
+          okButtonText: "Ok!"
+        });
         return;
       }
 
       if (!this.user.domain) {
-        Toast.makeText("Selecteer uw domein!").show();
+        dialogs.alert({
+          title: "Error",
+          message: "Selecteer uw domein!",
+          okButtonText: "Ok!"
+        });
         return;
       }
       this.login();
     },
     login() {
       this.isProcessing = true;
-      this.$store.dispatch('auth/loginUser', this.user);
+      this.$store.dispatch("auth/loginUser", this.user);
     },
     domainChanged(args) {
-      this.user.domain = this.domains[args.newIndex]
+      this.user.domain = this.domains[args.newIndex];
     }
   },
   created() {
     this.$store.subscribe((mutation, state) => {
-      if ( mutation.type === 'auth/setToken' ) {
+      if (mutation.type === "auth/setToken") {
         this.$navigateTo(WelcomeScreen, {
           clearHistory: true,
           transition: {
-            name: 'fade',
+            name: "fade",
             duration: 200
           },
           props: {
@@ -146,10 +161,10 @@ export default {
         });
       }
 
-      if ( mutation.type === 'auth/setIsProcessing' ) {
+      if (mutation.type === "auth/setIsProcessing") {
         this.isProcessing = state.auth.isProcessing;
       }
-    })
+    });
   }
 };
 </script>
@@ -161,7 +176,7 @@ ActivityIndicator {
 }
 
 Page {
-  background-image: url('~/assets/images/SplashScreen.jpg');
+  background-image: url("~/assets/images/SplashScreen.jpg");
   background-repeat: no-repeat;
   background-position: center top;
   background-size: cover;
@@ -180,7 +195,7 @@ Page {
 }
 
 .isFaded {
-  opacity: 0.75
+  opacity: 0.75;
 }
 
 .fadeBackground {

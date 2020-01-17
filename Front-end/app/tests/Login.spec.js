@@ -1,21 +1,36 @@
 import { shallowMount, mount, shallow, createLocalVue } from "@vue/test-utils";
 import Login from "../components/login/LoginPage";
 import Vuex from "vuex";
-import * as Toast from "nativescript-toast";
 import axios from "axios";
-import { getString } from "tns-core-modules/application-settings";
+import * as dialogs from 'tns-core-modules/ui/dialogs';
+import * as application from "tns-core-modules/application";
+import { on } from "cluster";
 
 jest.mock("tns-core-modules/application-settings", () => ({
+  getString: jest.fn(() => ""),
+  setString: jest.fn(),
+  clear: jest.fn()
+}));
+
+jest.mock('nativescript-fingerprint-auth', () => ({
+  FingerprintAuth: jest.fn(),
   getString: jest.fn(() => "")
 }));
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-jest.mock("nativescript-toast", () => ({
-  makeText: jest.fn(() => ({
-    show: jest.fn()
-  }))
+jest.mock("tns-core-modules/ui/dialogs", () => ({
+  alert: jest.fn(() => Promise.resolve())
+}));
+
+jest.mock('tns-core-modules/application', () => ({
+  android: {
+    on: jest.fn()
+  },
+  AndroidApplication: {
+    activityBackPressedEvent: {}
+  }
 }));
 
 jest.mock("axios", () => ({
@@ -204,31 +219,46 @@ describe("LoginPage.vue functional", () => {
     });
   });
 
-  it("Should show a toast if username is empty", async function() {
+  it("Should show a dialog if username is empty", async function () {
     const wrapper = shallowMount(Login, { store, localVue });
     wrapper.vm.onButtonTap();
 
-    await expect(Toast.makeText).toBeCalledWith("Vul uw gebruikersnaam in!");
+    await expect(dialogs.alert).toBeCalledWith(
+      {
+        title: 'Error',
+        message: "Vul uw gebruikersnaam in!",
+        okButtonText: 'Ok!'
+      });
   });
 
-  it("Should show a toast if password is empty", async function() {
+  it("Should show a dialog if password is empty", async function () {
     const wrapper = shallowMount(Login, { store, localVue });
     wrapper.vm.user.username = "Test";
     wrapper.vm.onButtonTap();
 
-    await expect(Toast.makeText).toBeCalledWith("Vul uw wachtwoord in!");
+    await expect(dialogs.alert).toBeCalledWith(
+      {
+        title: 'Error',
+        message: "Vul uw wachtwoord in!",
+        okButtonText: 'Ok!'
+      });
   });
 
-  it("Should show a toast if accountname is empty", async function() {
+  it("Should show a dialog if accountname is empty", async function () {
     const wrapper = shallowMount(Login, { store, localVue });
     wrapper.vm.user.username = "Test";
     wrapper.vm.user.password = "OK";
     wrapper.vm.onButtonTap();
 
-    await expect(Toast.makeText).toBeCalledWith("Vul uw accountnaam in!");
+    await expect(dialogs.alert).toBeCalledWith(
+      {
+        title: 'Error',
+        message: "Vul uw accountnaam in!",
+        okButtonText: 'Ok!'
+      });
   });
 
-  it.skip("Should set isProcessing to true when logging in", async function() {
+  it.skip("Should set isProcessing to true when logging in", async function () {
     const wrapper = shallowMount(Login, { store, localVue });
     wrapper.vm.login();
 
@@ -243,14 +273,19 @@ describe("LoginPage.vue functional", () => {
     );
   });
 
-  it("Should show a toast if accountname is empty", async function() {
+  it("Should show a dialog if accountname is empty", async function () {
     const wrapper = shallowMount(Login, { store, localVue });
     wrapper.vm.user.username = "Test";
     wrapper.vm.user.password = "OK";
     wrapper.vm.user.accountname = "";
     wrapper.vm.onButtonTap();
 
-    await expect(Toast.makeText).toBeCalledWith("Vul uw accountnaam in!");
+    await expect(dialogs.alert).toBeCalledWith(
+      {
+        title: 'Error',
+        message: "Vul uw accountnaam in!",
+        okButtonText: 'Ok!'
+      });
   });
 
   it("Expect login to be called", async () => {
@@ -269,7 +304,7 @@ describe("LoginPage.vue functional", () => {
     await expect(method).toBeCalled();
   });
 
-  it("Expect Toast to be shown when username is null", async () => {
+  it("Expect dialog to be shown when username is null", async () => {
     const formData = {
       user: {
         username: null,
@@ -286,10 +321,15 @@ describe("LoginPage.vue functional", () => {
     wrapper.vm.onButtonTap();
 
     await expect(method).toBeCalled();
-    await expect(Toast.makeText).toBeCalledWith("Vul uw gebruikersnaam in!");
+    await expect(dialogs.alert).toBeCalledWith(
+      {
+        title: 'Error',
+        message: "Vul uw gebruikersnaam in!",
+        okButtonText: 'Ok!'
+      });
   });
 
-  it("Expect Toast to be shown when password is null", async () => {
+  it("Expect dialog to be shown when password is null", async () => {
     const formData = {
       user: {
         username: 'null',
@@ -306,10 +346,15 @@ describe("LoginPage.vue functional", () => {
     wrapper.vm.onButtonTap();
 
     await expect(method).toBeCalled();
-    await expect(Toast.makeText).toBeCalledWith("Vul uw wachtwoord in!");
+    await expect(dialogs.alert).toBeCalledWith(
+      {
+        title: 'Error',
+        message: "Vul uw wachtwoord in!",
+        okButtonText: 'Ok!'
+      });
   });
 
-  it("Expect Toast to be shown when accountname is null", async () => {
+  it("Expect dialog to be shown when accountname is null", async () => {
     const formData = {
       user: {
         username: 'll',
@@ -326,6 +371,11 @@ describe("LoginPage.vue functional", () => {
     wrapper.vm.onButtonTap()
 
     await expect(method).toBeCalled();
-    await expect(Toast.makeText).toBeCalledWith("Vul uw accountnaam in!");
+    await expect(dialogs.alert).toBeCalledWith(
+      {
+        title: 'Error',
+        message: "Vul uw accountnaam in!",
+        okButtonText: 'Ok!'
+      });
   });
 });

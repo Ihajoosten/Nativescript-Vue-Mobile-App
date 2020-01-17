@@ -5,6 +5,25 @@ import Vuex from "vuex";
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
+jest.mock('tns-core-modules/application', () => ({
+  android: {
+    on: jest.fn()
+  },
+  AndroidApplication: {
+    activityBackPressedEvent: {}
+  }
+}));
+
+jest.mock("tns-core-modules/application-settings", () => ({
+  getString: jest.fn(() => ""),
+  setString: jest.fn(),
+  clear: jest.fn()
+}));
+
+jest.mock("tns-core-modules/ui/dialogs", () => ({
+  alert: jest.fn(() => Promise.resolve())
+}));
+
 describe("HoursPage.vue", () => {
   let store;
   let state;

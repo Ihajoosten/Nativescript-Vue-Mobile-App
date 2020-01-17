@@ -15,6 +15,59 @@ module.exports = {
   hasErr: (err, rows, res) => {
     return handleError(err, rows, res);
   },
+  handleWorkedHoursResponse: (req, err, rows, res) => {
+    if ( !handleError(err, rows, res) ) {
+      for ( let i = 0; i < rows.length; i++ ) {
+        let wh = rows[i];
+        let pause = wh.Pause;
+        let pauseMin = pause % 60;
+        let pauseHour = Math.floor(pause / 60);
+
+        if ( wh.EndTime !== null ) {
+          let start = wh.StartTime.split(':');
+          let end = wh.EndTime.split(':');
+          let startHour = +start[0];
+          let startMin = +start[1];
+          let endHour = +end[0];
+          let endMin = +end[1];
+
+          let hours = endHour - startHour;
+          if (endHour < startHour) {
+            hours = 24 - (startHour - endHour);
+          }
+          let minutes = endMin - startMin;
+          if (endMin < startMin) {
+            minutes = 60 - (startMin - endMin);
+            hours--;
+          }
+
+          hours -= pauseHour;
+          if (minutes < pauseMin) {
+            hours--;
+            minutes = 60 - (pauseMin - minutes);
+          } else {
+            minutes -= pauseMin;
+          }
+
+          if (minutes < 10) {
+            minutes = '0' + minutes;
+          }
+          rows[i].Worked = hours + ":" + minutes;
+        }
+
+        if ( pauseMin < 10 ) {
+          pauseMin = '0' + pauseMin;
+        }
+        rows[i].Pause = pauseHour + ":" + pauseMin;
+      }
+
+      if ( req.token ) {
+        res.status(200).json({ result: rows, token: req.token});
+      } else {
+        res.status(200).json({ result:rows });
+      }
+    }
+  },
 
   // Query for inserting test data
   queryAllForLogin: hash => {
@@ -167,13 +220,15 @@ module.exports = {
                 \`Branch_DepartmentId\`,
                 \`Date\`,
                 \`StartTime\`,
-                \`EndTime\`)
+                \`EndTime\`,
+                \`Pause\`)
                 VALUES
                 ((SELECT u.Id FROM \`User\` as u WHERE u.Username = 'tNuman'),
                 (SELECT bd.Id FROM Branch_Department as bd WHERE bd.BranchId = (SELECT b.Id FROM Branch as b WHERE b.Name = 'Breda')),
                 curdate(),
-                curtime(),
-                curtime());`;
+                '02:55',
+                '08:35',
+                123);`;
   },
 
   // Query for testing check-in

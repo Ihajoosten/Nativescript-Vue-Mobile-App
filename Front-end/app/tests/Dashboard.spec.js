@@ -8,6 +8,24 @@ jest.mock('tns-core-modules/application-settings', () => ({
   getString: jest.fn(() => "")
 }));
 
+jest.mock('nativescript-fingerprint-auth', () => ({
+  FingerprintAuth: jest.fn(),
+  getString: jest.fn(() => "")
+}));
+
+jest.mock('tns-core-modules/application', () => ({
+  android: {
+    on: jest.fn()
+  },
+  AndroidApplication: {
+    activityBackPressedEvent: {}
+  }
+}));
+
+jest.mock("tns-core-modules/ui/dialogs", () => ({
+  alert: jest.fn(() => Promise.resolve())
+}));
+
 const localVue = createLocalVue();
 localVue.use(Vuex)
 
@@ -16,7 +34,7 @@ describe('Dashboard.vue', () => {
   let state;
   let actions;
 
-  beforeEach(() =>{
+  beforeEach(() => {
     state = {
       token: ''
     };
@@ -34,7 +52,7 @@ describe('Dashboard.vue', () => {
   });
 
   // jest.mock('nativescript-drop-drown');
-  jest.mock("nativescript-toast");
+
 
 
   it('mounts and renders', async () => {

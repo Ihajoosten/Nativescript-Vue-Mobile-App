@@ -47,6 +47,7 @@ import CheckOutComponent from "../Check-out/CheckOutComponent";
 import ConfirmCheckInComponent from "../Check-in/ConfirmationCheckInComponent";
 import ConfirmCheckOutComponent from "../Check-out/ConfirmationCheckOutComponent";
 import ConfirmPauseComponent from "../Pause/ConfirmationPauseComponent";
+import { getString, setString } from 'tns-core-modules/application-settings';
 
 export default {
   components: {
@@ -93,6 +94,11 @@ export default {
       this.startTime = "";
       this.isCheckedIn = false;
       this.checkInIsConfirmed = false;
+
+      setString('pause', '');
+      setString('checkIn', '');
+      this.$store.dispatch('checkIn/clearState');
+      this.$store.dispatch('pause/clearState');
     },
     onPauseTap(isPausedIn) {
       let d = new Date(Date.now());
@@ -114,6 +120,19 @@ export default {
     },
     onPauseConfirmed() {
       this.isOnPauseTapped = false;
+    }
+  },
+  mounted() {
+    if ( getString('checkIn') && getString('checkIn') !== '' ) {
+       const checkInData = JSON.parse(getString('checkIn'));
+       this.branchId = checkInData.branchId;
+       this.departmentId = checkInData.departmentId;
+       this.checkInIsConfirmed = true;
+       this.isCheckedIn = true;
+
+       if ( getString('pause') && getString('pause') !== '') {
+         this.isPause = true;
+       }
     }
   }
 };

@@ -33,7 +33,7 @@
 
       <TabContentItem>
         <Frame>
-          <CalendarComponent :token="token"/>
+          <CalendarComponent :token="token" />
         </Frame>
       </TabContentItem>
 
@@ -53,37 +53,47 @@
 </template>
 
 <script>
-  import AccountComponent from "./AccountPage";
-  import CalendarComponent from "./CalendarPage";
-  import HoursComponent from "./HoursPage";
-  import HomeComponent from "./HomePage";
-  import SettingComponent from "./SettingPage"
+import AccountComponent from "./AccountPage";
+import CalendarComponent from "./CalendarPage";
+import HoursComponent from "./HoursPage";
+import HomeComponent from "./HomePage";
+import SettingComponent from "./SettingPage";
+import * as application from "tns-core-modules/application";
 
-  export default {
-    components: {
-      HomeComponent,
-      HoursComponent,
-      CalendarComponent,
-      AccountComponent,
-      SettingComponent
-    },
-    created() {
-      this.$store.dispatch('checkIn/fetchAllWorkedHours', this.token);
-    },
-    computed: {
-      token() {
-        return this.$store.state.auth.token;
-      }
+export default {
+  components: {
+    HomeComponent,
+    HoursComponent,
+    CalendarComponent,
+    AccountComponent,
+    SettingComponent
+  },
+  created() {
+    this.$store.dispatch("checkIn/fetchAllWorkedHours", this.token);
+  },
+  computed: {
+    token() {
+      return this.$store.state.auth.token;
     }
-  };
+  }
+};
+
+if ( application.android ) {
+  application.android.on(
+          application.AndroidApplication.activityBackPressedEvent,
+          args => {
+            args.cancel = true;
+          }
+  );
+}
 </script>
 
 <style scoped>
-  TabStripItem {
-    font-size: 25px;
-    color: #dddddd;
-  }
-  TabStripItem:active {
-    color: #00a0d1;
-  }
+TabStripItem {
+  font-size: 25px;
+  color: #dddddd;
+}
+TabStripItem:active {
+  color: #00a0d1;
+}
 </style>

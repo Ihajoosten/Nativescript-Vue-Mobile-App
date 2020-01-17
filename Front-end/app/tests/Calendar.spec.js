@@ -3,6 +3,15 @@ import Calendar from '../components/dashboard/CalendarPage';
 import Vuex from "vuex";
 import Home from "../components/dashboard/HomePage";
 
+jest.mock('tns-core-modules/application', () => ({
+  android: {
+    on: jest.fn()
+  },
+  AndroidApplication: {
+    activityBackPressedEvent: {}
+  }
+}));
+
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
